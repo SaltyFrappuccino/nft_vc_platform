@@ -1,9 +1,8 @@
 from flask import request, jsonify
 from web3 import Web3
 
-from ..models.certificate import Certificate, NFTToken, db
-from ..models.user import User
-
+from ..models import Certificate, NFTToken, User
+from database import  db
 w3 = Web3(Web3.HTTPProvider('https://polygon-amoy.public.blastapi.io'))
 
 

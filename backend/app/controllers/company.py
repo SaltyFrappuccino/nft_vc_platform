@@ -1,7 +1,6 @@
 from flask import request, jsonify
 
-from app.models.company import Company, CompanyEmployee
-from app.models.user import User
+from app.models import Company, CompanyEmployee, User
 from database import db
 
 
