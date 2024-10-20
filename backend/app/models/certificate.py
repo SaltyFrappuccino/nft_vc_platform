@@ -23,4 +23,6 @@ class NFTToken(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     certificate_id = db.Column(db.Integer, db.ForeignKey('certificates.id', ondelete='CASCADE'))
     token_hash = db.Column(db.String(255), unique=True, nullable=True)
+    abi = db.Column(db.String, nullable=True)  # Новое поле для хранения ABI
     certificate = db.relationship('Certificate', backref='nft_token')
+
