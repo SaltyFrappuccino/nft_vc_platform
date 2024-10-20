@@ -58,31 +58,6 @@ def login():
     return jsonify({"error": "Invalid email or password"}), 401
 
 
-def link_wallet():
-    """
-    Link wallet to user
-    ---
-    tags:
-      - Users
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              walletAddress:
-                type: string
-                example: "0x1234567890abcdef"
-    responses:
-      200:
-        description: Wallet linked successfully
-    """
-    data = request.json
-    # Реализация привязки кошелька здесь
-    return jsonify({"message": "Wallet linked successfully"}), 200
-
-
 def reset_password():
     """
     Reset user password
@@ -144,7 +119,7 @@ def get_all_users():
     user_list = [{"first_name": user.first_name, "last_name": user.last_name, "email": user.email} for user in users]
     return jsonify(user_list), 200
 
-def update_nft_wallet_address(user_id, nft_wallet_address):
+def link_wallet(user_id, nft_wallet_address):
     """
     Update user's NFT wallet address.
     :param user_id: ID of the user
