@@ -1,5 +1,7 @@
 # NFT VC Platform
 
+**[Веб-версия Документации](https://saltyfrappuccino.github.io/nft_vc_platform/главная.html)**
+
 ![Backend](https://img.shields.io/badge/Backend-Python%2C%20Flask%2C%20MySQL%2C%20JWT-brightgreen)
 ![Frontend](https://img.shields.io/badge/Frontend-React-blue)
 ![Web3](https://img.shields.io/badge/Web3-Solidity-orange)
