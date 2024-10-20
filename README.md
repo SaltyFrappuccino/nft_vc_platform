@@ -18,6 +18,33 @@ NFT VC Platform — Платформа для создания и хранени
 - **frontend** — Фронт
 - **docs** — Документация в виде веб-сайта. [Ссылка на документацию](https://saltyfrappuccino.github.io/nft_vc_platform/главная.html)
 
+## Как запустить?
+
+### Бэк:
+ 1. Установите зависимости:
+
+`pip install -r requirements.txt`
+         
+2. Запустите приложение:
+
+            `python app.py`
+
+### Фронт
+
+1. Установите зависимости:
+
+`npm i`
+         
+2. Запустите приложение:
+
+`npm start`
+
+### Докер
+
+1. Запуск сервиса через Compose
+
+`docker-compose up`
+
 ## Структура БД
 
 ![Database](content/database.png)
