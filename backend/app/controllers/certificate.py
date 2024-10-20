@@ -134,7 +134,7 @@ def convert_to_nft(id):
 
 def revoke_certificate(id):
     """
-    Revoke a certificate and its associated NFT
+    Revoke a certificate
     ---
     tags:
       - Certificates
@@ -155,9 +155,9 @@ def revoke_certificate(id):
               properties:
                 message:
                   type: string
-                  example: "Сертификат отозван. TX Hash: 0x123abc..."
+                  example: "Сертификат отозван."
       404:
-        description: Certificate or NFT not found
+        description: Certificate not found
         content:
           application/json:
             schema:
@@ -167,7 +167,7 @@ def revoke_certificate(id):
                   type: string
                   example: "Сертификат не найден"
       400:
-        description: Error revoking NFT
+        description: Error revoking certificate
         content:
           application/json:
             schema:
@@ -175,41 +175,23 @@ def revoke_certificate(id):
               properties:
                 error:
                   type: string
-                  example: "Ошибка отзыва NFT"
+                  example: "Ошибка отзыва сертификата"
     """
+    # Получаем сертификат по ID
     certificate = Certificate.query.get(id)
     if not certificate:
         return jsonify({'error': 'Сертификат не найден'}), 404
 
-    nft_token = NFTToken.query.filter_by(certificate_id=certificate.id).first()
-    if nft_token and nft_token.token_hash:
-        abi = nft_token.abi
-        token_address = Web3.to_checksum_address(nft_token.token_hash)
+    # Отзываем сертификат
+    # Здесь можете добавить любую логику, связанную с отзывом (например, пометить как отозванный)
+    # Например, если есть поле revoked в таблице, то:
+    # certificate.revoked = True
+    # db.session.commit()
 
-        contract = w3.eth.contract(address=token_address, abi=abi)
+    db.session.delete(certificate)  # Пример: удаление сертификата из базы данных
+    db.session.commit()
 
-        user = User.query.get(certificate.owner_id)
-        if not user:
-            return jsonify({'error': 'Пользователь не найден'}), 404
-
-        try:
-            tx = contract.functions.revoke(user.nft_wallet_address).buildTransaction({
-                'chainId': 80001,
-                'gas': 70000,
-                'gasPrice': w3.to_wei('20', 'gwei'),
-                'nonce': w3.eth.get_transaction_count(user.nft_wallet_address),
-            })
-
-            signed_tx = w3.eth.account.signTransaction(tx, private_key='Как передавать ключ пока не придумал, '
-                                                                       'мб брать отюзеров, но тогда его нужно сейвить '
-                                                                       'по хитрому в БД.')
-            tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
-
-            return jsonify({'message': 'Сертификат отозван. TX Hash: ' + tx_hash.hex()}), 200
-        except Exception as e:
-            return jsonify({'error': 'Ошибка отзыва NFT', 'details': str(e)}), 400
-    else:
-        return jsonify({'error': 'NFT не найден'}), 404
+    return jsonify({'message': 'Сертификат отозван.'}), 200
 
 
 def transfer_certificate(id):
