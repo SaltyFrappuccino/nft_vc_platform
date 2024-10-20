@@ -4,7 +4,12 @@
 
 <instance-profile id="nvp"
                  name="NFT VC Platform"
-                 start-page="starter.md">
+                 start-page="Главная.md">
 
-    <toc-element topic="starter.md"/>
+    <toc-element topic="Главная.md"/>
+    <toc-element topic="Начало-Работы.md"/>
+    <toc-element topic="Backend.md"/>
+    <toc-element topic="Frontend.md"/>
+    <toc-element topic="Web3.md"/>
+    <toc-element topic="Архитектура.md"/>
 </instance-profile>
