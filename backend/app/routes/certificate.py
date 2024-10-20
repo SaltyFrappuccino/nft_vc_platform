@@ -1,5 +1,11 @@
 from flask import Flask
-from app.controllers.certificate import upload_certificate, convert_to_nft, revoke_certificate, transfer_certificate, get_certificate_after_course
+from app.controllers.certificate import (
+    upload_certificate,
+    convert_to_nft,
+    revoke_certificate,
+    transfer_certificate,
+    get_certificate_after_course
+)
 
 
 def init_certificate_routes(app: Flask):

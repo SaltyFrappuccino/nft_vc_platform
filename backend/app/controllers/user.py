@@ -143,3 +143,19 @@ def get_all_users():
     users = User.query.all()
     user_list = [{"first_name": user.first_name, "last_name": user.last_name, "email": user.email} for user in users]
     return jsonify(user_list), 200
+
+def update_nft_wallet_address(user_id, nft_wallet_address):
+    """
+    Update user's NFT wallet address.
+    :param user_id: ID of the user
+    :param nft_wallet_address: New NFT wallet address to be saved
+    :return: Response message
+    """
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    user.nft_wallet_address = nft_wallet_address
+    db.session.commit()
+
+    return jsonify({"message": "NFT wallet address updated successfully"}), 200

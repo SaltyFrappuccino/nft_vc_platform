@@ -9,8 +9,7 @@ class User(db.Model):
     last_name = db.Column(db.String(100), nullable=True)
     email = db.Column(db.String(255), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
-    bio = db.Column(db.Text, nullable=True)
-    skills = db.Column(db.JSON, nullable=True)
+    nft_wallet_address = db.Column(db.String(255), nullable=True)  # Новое поле для хранения адреса NFT-кошелька
 
     def __repr__(self):
         return f"<User {self.email}>"

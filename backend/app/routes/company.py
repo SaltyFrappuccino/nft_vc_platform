@@ -1,5 +1,13 @@
 from flask import Flask
-from app.controllers.company import register_company, fire_employee, transfer_employee, hire_employee, verify_work_experience, search_users, get_access_key
+from app.controllers.company import (
+    register_company,
+    fire_employee,
+    transfer_employee,
+    hire_employee,
+    verify_work_experience,
+    search_users,
+    get_access_key
+)
 
 
 def init_company_routes(app: Flask):
