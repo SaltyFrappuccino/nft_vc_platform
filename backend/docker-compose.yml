@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=mysql+pymysql://root:Heartattack1801!@172.18.0.2/nft_vc_platform
+      - FLASK_RUN_HOST=0.0.0.0
+      - FLASK_ENV=development
+      - PYTHONUNBUFFERED=True
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: nft_vc_platform
+      MYSQL_ROOT_PASSWORD: Heartattack1801!
+    ports:
+      - "3444:3306"
