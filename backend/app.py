@@ -1,37 +1,21 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_swagger_ui import get_swaggerui_blueprint
+from database import db
+from app.routes.user import init_user_routes
+from app.routes.company import init_company_routes
+from app.routes.certificate import init_certificate_routes
+from config import Config
 
-db = SQLAlchemy()
-migrate = Migrate()
+app = Flask(__name__)
+app.config.from_object(Config)
 
+db.init_app(app)
 
-def create_app(config_name='config.DevelopmentConfig'):
-    app = Flask(__name__)
-    app.config.from_object(config_name)
+with app.app_context():
+    db.create_all()
 
-    db.init_app(app)
-    migrate.init_app(app, db)
+init_user_routes(app)
+init_company_routes(app)
+init_certificate_routes(app)
 
-    swagger_url = '/api/docs'  # URL для доступа к Swagger UI
-    api_url = '/static/swagger.yaml'  # Путь к файлу спецификации OpenAPI
-    swagger_blueprint = get_swaggerui_blueprint(swagger_url, api_url)
-    app.register_blueprint(swagger_blueprint, url_prefix=swagger_url)
-
-    from src.routes.user_routes import user_blueprint
-    from src.routes.company_routes import company_blueprint
-    from src.routes.certificate_routes import certificate_blueprint
-    from src.routes.nft_routes import nft_blueprint
-
-    app.register_blueprint(user_blueprint, url_prefix='/user')
-    app.register_blueprint(company_blueprint, url_prefix='/company')
-    app.register_blueprint(certificate_blueprint, url_prefix='/certificates')
-    app.register_blueprint(nft_blueprint, url_prefix='/nft')
-
-    return app
-
-
-if __name__ == "__main__":
-    app = create_app()
-    app.run(host='0.0.0.0', port=5000, debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)

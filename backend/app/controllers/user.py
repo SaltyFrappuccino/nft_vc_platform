@@ -1,0 +1,115 @@
+from flask import request, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
+
+from app.models import User
+from database import db
+
+def register():
+    data = request.json
+    if not data or "email" not in data or "password" not in data:
+        return jsonify({"error": "Invalid data"}), 400
+
+    existing_user = User.query.filter_by(email=data["email"]).first()
+    if existing_user:
+        return jsonify({"error": "User already exists"}), 400
+
+    new_user = User(
+        first_name=data.get("firstName"),
+        last_name=data.get("lastName"),
+        email=data["email"],
+        password=generate_password_hash(data["password"]),
+    )
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({"message": "User registered successfully"}), 201
+
+
+
+def login():
+    """
+    User login
+    ---
+    tags:
+      - Users
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                example: "john.doe@example.com"
+              password:
+                type: string
+                example: "strongpassword"
+    responses:
+      200:
+        description: Login successful
+      401:
+        description: Invalid email or password
+    """
+    data = request.json
+    user = User.query.filter_by(email=data.get("email")).first()
+    if user and check_password_hash(user.password, data.get("password")):
+        return jsonify({"message": "Login successful"}), 200
+
+    return jsonify({"error": "Invalid email or password"}), 401
+
+
+def link_wallet():
+    """
+    Link wallet to user
+    ---
+    tags:
+      - Users
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              walletAddress:
+                type: string
+                example: "0x1234567890abcdef"
+    responses:
+      200:
+        description: Wallet linked successfully
+    """
+    data = request.json
+    # Реализация привязки кошелька здесь
+    return jsonify({"message": "Wallet linked successfully"}), 200
+
+
+def reset_password():
+    """
+    Reset user password
+    ---
+    tags:
+      - Users
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                example: "john.doe@example.com"
+    responses:
+      200:
+        description: Instructions for password recovery have been sent
+      404:
+        description: User not found
+    """
+    data = request.json
+    user = User.query.filter_by(email=data.get("email")).first()
+    if user:
+        # Логика для восстановления пароля
+        return jsonify({"message": "Instructions for password recovery have been sent"}), 200
+
+    return jsonify({"error": "User not found"}), 404

@@ -1,0 +1,726 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "NFT/VC Credential Management Platform API",
+    "description": "API для управления сертификатами и достижениями, поддерживающее Verifiable Credentials (VC) и NFT-токены.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://nft-vc-platform.com/api/v1"
+    }
+  ],
+  "tags": [
+    {
+      "name": "user",
+      "description": "Операции с пользователями"
+    },
+    {
+      "name": "company",
+      "description": "Операции с компаниями"
+    },
+    {
+      "name": "certificates",
+      "description": "Управление сертификатами и документами"
+    },
+    {
+      "name": "nft",
+      "description": "Преобразование документов в NFT"
+    }
+  ],
+  "paths": {
+    "/user/register": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Регистрация нового пользователя",
+        "description": "Регистрирует нового пользователя на платформе.",
+        "requestBody": {
+          "description": "Объект пользователя для регистрации",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Успешная регистрация"
+          },
+          "400": {
+            "description": "Ошибка валидации данных"
+          }
+        }
+      }
+    },
+    "/user/login": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Логин пользователя",
+        "description": "Аутентификация пользователя на платформе.",
+        "requestBody": {
+          "description": "Логин данные",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный логин, возвращает токен"
+          },
+          "401": {
+            "description": "Неверный email или пароль"
+          }
+        }
+      }
+    },
+    "/company/register": {
+      "post": {
+        "tags": [
+          "company"
+        ],
+        "summary": "Регистрация компании",
+        "description": "Регистрирует новую компанию.",
+        "requestBody": {
+          "description": "Данные компании для регистрации",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Company"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Успешная регистрация компании"
+          },
+          "400": {
+            "description": "Ошибка валидации данных"
+          }
+        }
+      }
+    },
+    "/certificates/upload": {
+      "post": {
+        "tags": [
+          "certificates"
+        ],
+        "summary": "Загрузка сертификата",
+        "description": "Загружает новый сертификат на платформу.",
+        "requestBody": {
+          "description": "Данные сертификата",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Certificate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Сертификат успешно загружен"
+          },
+          "400": {
+            "description": "Ошибка валидации данных"
+          }
+        }
+      }
+    },
+    "/certificates/{id}/convert-to-nft": {
+      "post": {
+        "tags": [
+          "nft"
+        ],
+        "summary": "Преобразование сертификата в NFT",
+        "description": "Преобразует загруженный сертификат в NFT-токен.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID сертификата для конвертации",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешная конвертация в NFT"
+          },
+          "404": {
+            "description": "Сертификат не найден"
+          }
+        }
+      }
+    },
+    "/certificates/{id}/revoke": {
+      "post": {
+        "tags": [
+          "certificates"
+        ],
+        "summary": "Отозвать сертификат",
+        "description": "Отзывает сертификат у пользователя.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID сертификата для отзыва",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Данные для отзыва",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "description": "Причина отзыва"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Сертификат успешно отозван"
+          },
+          "404": {
+            "description": "Сертификат не найден"
+          }
+        }
+      }
+    },
+    "/certificates/{id}/transfer": {
+      "post": {
+        "tags": [
+          "certificates"
+        ],
+        "summary": "Передать сертификат",
+        "description": "Передаёт сертификат другому пользователю.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID сертификата для передачи",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Данные для передачи сертификата",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "to_user_id": {
+                    "type": "string",
+                    "description": "ID пользователя, которому передаётся сертификат"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Сертификат успешно передан"
+          },
+          "404": {
+            "description": "Сертификат или пользователь не найдены"
+          }
+        }
+      }
+    },
+    "/company/{id}/fire-employee": {
+      "post": {
+        "tags": [
+          "company"
+        ],
+        "summary": "Уволить сотрудника",
+        "description": "Увольняет сотрудника компании.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID компании",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Данные сотрудника для увольнения",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "employee_id": {
+                    "type": "string",
+                    "description": "ID сотрудника для увольнения"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Сотрудник успешно уволен"
+          },
+          "404": {
+            "description": "Компания или сотрудник не найдены"
+          }
+        }
+      }
+    },
+    "/company/{id}/transfer-employee": {
+      "post": {
+        "tags": [
+          "company"
+        ],
+        "summary": "Перевод сотрудника",
+        "description": "Переводит сотрудника на новую должность в компании.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID компании",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Данные для перевода",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "employee_id": {
+                    "type": "string",
+                    "description": "ID сотрудника"
+                  },
+                  "new_position": {
+                    "type": "string",
+                    "description": "Новая должность сотрудника"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Сотрудник успешно переведён"
+          },
+          "404": {
+            "description": "Компания или сотрудник не найдены"
+          }
+        }
+      }
+    },
+    "/company/{id}/hire-employee": {
+      "post": {
+        "tags": [
+          "company"
+        ],
+        "summary": "Найм нового сотрудника",
+        "description": "Нанимает нового сотрудника в компанию.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID компании",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Данные нового сотрудника",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Сотрудник успешно нанят"
+          },
+          "400": {
+            "description": "Ошибка валидации данных"
+          }
+        }
+      }
+    },
+    "/company/{id}/verify-work-experience": {
+      "get": {
+        "tags": [
+          "company"
+        ],
+        "summary": "Проверка стажа",
+        "description": "Проверяет стаж работы сотрудника в компании.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID компании",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "employee_id",
+            "in": "query",
+            "description": "ID сотрудника",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Стаж работы подтверждён"
+          },
+          "404": {
+            "description": "Компания или сотрудник не найдены"
+          }
+        }
+      }
+    },
+    "/company/search-users": {
+      "get": {
+        "tags": [
+          "company"
+        ],
+        "summary": "Поиск пользователей",
+        "description": "Ищет пользователей по параметрам.",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "description": "Строка поиска по имени или email",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Список пользователей"
+          },
+          "404": {
+            "description": "Пользователи не найдены"
+          }
+        }
+      }
+    },
+    "/company/{id}/access-key": {
+      "get": {
+        "tags": [
+          "company"
+        ],
+        "summary": "Получение ключа доступа",
+        "description": "Генерация ключа доступа для компании.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID компании",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ключ доступа успешно получен"
+          },
+          "404": {
+            "description": "Компания не найдена"
+          }
+        }
+      }
+    },
+    "/course/complete": {
+      "post": {
+        "tags": [
+          "certificates"
+        ],
+        "summary": "Прохождение курса",
+        "description": "Завершение курса пользователем.",
+        "requestBody": {
+          "description": "Данные о завершении курса",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string"
+                  },
+                  "course_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Курс успешно завершён"
+          }
+        }
+      }
+    },
+    "/course/{id}/certificate": {
+      "post": {
+        "tags": [
+          "certificates"
+        ],
+        "summary": "Получение сертификата после курса",
+        "description": "Получение сертификата после завершения курса.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID курса",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Данные для получения сертификата",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Сертификат успешно выдан"
+          },
+          "404": {
+            "description": "Курс не найден или пользователь не завершил курс"
+          }
+        }
+      }
+    },
+    "/user/link-wallet": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Привязка кошелька",
+        "description": "Привязывает криптокошелёк к аккаунту пользователя.",
+        "requestBody": {
+          "description": "Данные для привязки кошелька",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string"
+                  },
+                  "wallet_address": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Кошелёк успешно привязан"
+          },
+          "400": {
+            "description": "Ошибка валидации данных"
+          }
+        }
+      }
+    },
+    "/user/reset-password": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Восстановление пароля",
+        "description": "Восстановление пароля пользователя через email.",
+        "requestBody": {
+          "description": "Email для восстановления пароля",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Инструкции по восстановлению отправлены"
+          },
+          "404": {
+            "description": "Пользователь не найден"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "profile": {
+            "type": "object",
+            "properties": {
+              "bio": {
+                "type": "string"
+              },
+              "skills": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Company": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "employees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          }
+        }
+      },
+      "Certificate": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "issuer": {
+            "type": "string"
+          },
+          "issuedDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "type": {
+            "type": "string",
+            "description": "VC или NFT"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      }
+    }
+  }
+}
