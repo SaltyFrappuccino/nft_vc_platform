@@ -4,6 +4,7 @@ from app.routes.user import init_user_routes
 from app.routes.company import init_company_routes
 from app.routes.certificate import init_certificate_routes
 from config import Config
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -16,6 +17,8 @@ with app.app_context():
 init_user_routes(app)
 init_company_routes(app)
 init_certificate_routes(app)
+
+CORS(app)
 
 if __name__ == '__main__':
     app.run(debug=True)

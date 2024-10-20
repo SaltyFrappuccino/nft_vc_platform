@@ -1,8 +1,8 @@
 from flask import request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-
 from app.models import User
 from database import db
+
 
 def register():
     data = request.json
@@ -23,7 +23,6 @@ def register():
     db.session.commit()
 
     return jsonify({"message": "User registered successfully"}), 201
-
 
 
 def login():
@@ -113,3 +112,34 @@ def reset_password():
         return jsonify({"message": "Instructions for password recovery have been sent"}), 200
 
     return jsonify({"error": "User not found"}), 404
+
+
+def get_all_users():
+    """
+    Get all users
+    ---
+    tags:
+      - Users
+    responses:
+      200:
+        description: List of users
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  first_name:
+                    type: string
+                    example: "John"
+                  last_name:
+                    type: string
+                    example: "Doe"
+                  email:
+                    type: string
+                    example: "john.doe@example.com"
+    """
+    users = User.query.all()
+    user_list = [{"first_name": user.first_name, "last_name": user.last_name, "email": user.email} for user in users]
+    return jsonify(user_list), 200
