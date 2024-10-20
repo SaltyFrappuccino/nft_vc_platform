@@ -22,6 +22,14 @@ NFT VC Platform — Платформа для создания и хранени
 
 ![Database](content/database.png)
 
+## User-Flow
+
+User-Flow доступен по [ссылке](https://board.vk.com/?uid=8f781d47-c594-44f4-9431-85ef34317100)
+
+## Swagger UI
+
+Swagger доступен по пути `/apidocs`
+
 ## Спецификация API
 
 ### 1. Регистрация нового пользователя

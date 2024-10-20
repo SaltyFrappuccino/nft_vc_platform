@@ -1,10 +1,12 @@
+from flasgger import Swagger
 from flask import Flask
-from database import db
-from app.routes.user import init_user_routes
-from app.routes.company import init_company_routes
-from app.routes.certificate import init_certificate_routes
-from config import Config
 from flask_cors import CORS
+
+from app.routes.certificate import init_certificate_routes
+from app.routes.company import init_company_routes
+from app.routes.user import init_user_routes
+from config import Config
+from database import db
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -17,6 +19,14 @@ with app.app_context():
 init_user_routes(app)
 init_company_routes(app)
 init_certificate_routes(app)
+
+swagger = Swagger(app, template={
+    "swagger": "2.0",
+    "info": {
+        "title": "NFT VC Platform",
+        "description": "API documentation",
+        "version": "1.0.0"
+    }})
 
 CORS(app)
 

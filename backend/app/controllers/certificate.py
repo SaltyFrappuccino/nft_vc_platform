@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from web3 import Web3
+
 from ..models.certificate import Certificate, NFTToken, db
 from ..models.user import User
 
@@ -7,6 +8,33 @@ w3 = Web3(Web3.HTTPProvider('https://polygon-amoy.public.blastapi.io'))
 
 
 def upload_certificate():
+    """
+    Upload a new certificate
+    ---
+    tags:
+      - Certificates
+    responses:
+      201:
+        description: Certificate uploaded successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Сертификат успешно загружен"
+      400:
+        description: Error uploading certificate
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Ошибка загрузки сертификата"
+    """
     data = request.get_json()
     try:
         certificate = Certificate(
@@ -23,12 +51,59 @@ def upload_certificate():
 
 
 def convert_to_nft(id):
+    """
+    Convert a certificate to NFT
+    ---
+    tags:
+      - Certificates
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The ID of the certificate to convert
+        schema:
+          type: integer
+    responses:
+      200:
+        description: Certificate successfully converted to NFT
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Сертификат успешно преобразован в NFT"
+                transaction_hash:
+                  type: string
+                  example: "0x123abc..."
+      404:
+        description: Certificate or user not found
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Сертификат не найден"
+      400:
+        description: Error converting to NFT
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Ошибка преобразования в NFT"
+    """
     certificate = Certificate.query.get(id)
     if not certificate:
         return jsonify({'error': 'Сертификат не найден'}), 404
 
-    contract_address = 'YOUR_CONTRACT_ADDRESS'  # адрес  контракта
-    abi = 'YOUR_ABI'  # ABI  контракта
+    contract_address = 'YOUR_CONTRACT_ADDRESS'  # адрес контракта
+    abi = 'YOUR_ABI'  # ABI контракта
 
     contract = w3.eth.contract(address=contract_address, abi=abi)
 
@@ -59,6 +134,50 @@ def convert_to_nft(id):
 
 
 def revoke_certificate(id):
+    """
+    Revoke a certificate and its associated NFT
+    ---
+    tags:
+      - Certificates
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The ID of the certificate to revoke
+        schema:
+          type: integer
+    responses:
+      200:
+        description: Certificate successfully revoked
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Сертификат отозван. TX Hash: 0x123abc..."
+      404:
+        description: Certificate or NFT not found
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Сертификат не найден"
+      400:
+        description: Error revoking NFT
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Ошибка отзыва NFT"
+    """
     certificate = Certificate.query.get(id)
     if not certificate:
         return jsonify({'error': 'Сертификат не найден'}), 404
@@ -83,8 +202,8 @@ def revoke_certificate(id):
             })
 
             signed_tx = w3.eth.account.signTransaction(tx, private_key='Как передавать ключ пока не придумал, '
-                                                                       'мб брать отюзеров, но тогда его нужно сейвить'
-                                                                       ' по хитрому в БД.')
+                                                                       'мб брать отюзеров, но тогда его нужно сейвить '
+                                                                       'по хитрому в БД.')
             tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
 
             return jsonify({'message': 'Сертификат отозван. TX Hash: ' + tx_hash.hex()}), 200
@@ -95,6 +214,60 @@ def revoke_certificate(id):
 
 
 def transfer_certificate(id):
+    """
+    Transfer a certificate to another user
+    ---
+    tags:
+      - Certificates
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The ID of the certificate to transfer
+        schema:
+          type: integer
+      - name: to_user_id
+        in: body
+        required: true
+        description: The ID of the user to transfer the certificate to
+        schema:
+          type: object
+          properties:
+            to_user_id:
+              type: integer
+              example: 2
+    responses:
+      200:
+        description: Certificate successfully transferred
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Сертификат успешно передан. TX Hash: 0x123abc..."
+      404:
+        description: Certificate or user not found
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Пользователь не найден"
+      400:
+        description: Error transferring NFT
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Ошибка передачи NFT"
+    """
     certificate = Certificate.query.get(id)
     if not certificate:
         return jsonify({'error': 'Сертификат не найден'}), 404
@@ -121,8 +294,8 @@ def transfer_certificate(id):
             })
 
             signed_tx = w3.eth.account.signTransaction(tx, private_key='Как передавать ключ пока не придумал, '
-                                                                       'мб брать отюзеров, но тогда его нужно сейвить'
-                                                                       ' по хитрому в БД.')
+                                                                       'мб брать отюзеров, но тогда его нужно сейвить '
+                                                                       'по хитрому в БД.')
             tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
 
             certificate.owner_id = to_user.id
@@ -136,6 +309,43 @@ def transfer_certificate(id):
 
 
 def get_certificate_after_course():
+    """
+    Issue a certificate after course completion
+    ---
+    tags:
+      - Certificates
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              user_id:
+                type: integer
+                example: 1
+    responses:
+      200:
+        description: Certificate successfully issued
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Сертификат успешно выдан"
+      400:
+        description: Error issuing certificate
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Ошибка выдачи сертификата"
+    """
     data = request.get_json()
     user_id = data['user_id']
 

@@ -1,4 +1,5 @@
 from flask import Flask
+
 from app.controllers.company import (
     register_company,
     fire_employee,

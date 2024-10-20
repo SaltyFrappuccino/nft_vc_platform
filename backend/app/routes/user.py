@@ -1,4 +1,5 @@
 from flask import Flask
+
 from app.controllers.user import (
     register,
     login,
@@ -6,6 +7,7 @@ from app.controllers.user import (
     reset_password,
     get_all_users
 )
+
 
 def init_user_routes(app: Flask):
     app.route("/user/register", methods=['POST'])(register)

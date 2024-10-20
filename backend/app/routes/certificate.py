@@ -1,4 +1,5 @@
 from flask import Flask
+
 from app.controllers.certificate import (
     upload_certificate,
     convert_to_nft,
