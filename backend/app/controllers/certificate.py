@@ -134,7 +134,7 @@ def convert_to_nft(id):
 
 def revoke_certificate(id):
     """
-    Revoke a certificate
+    Revoke a certificate and its associated NFT
     ---
     tags:
       - Certificates
@@ -155,9 +155,9 @@ def revoke_certificate(id):
               properties:
                 message:
                   type: string
-                  example: "Сертификат отозван."
+                  example: "Сертификат отозван. TX Hash: 0x123abc..."
       404:
-        description: Certificate not found
+        description: Certificate or NFT not found
         content:
           application/json:
             schema:
@@ -167,7 +167,7 @@ def revoke_certificate(id):
                   type: string
                   example: "Сертификат не найден"
       400:
-        description: Error revoking certificate
+        description: Error revoking NFT
         content:
           application/json:
             schema:
@@ -175,23 +175,41 @@ def revoke_certificate(id):
               properties:
                 error:
                   type: string
-                  example: "Ошибка отзыва сертификата"
+                  example: "Ошибка отзыва NFT"
     """
-    # Получаем сертификат по ID
     certificate = Certificate.query.get(id)
     if not certificate:
         return jsonify({'error': 'Сертификат не найден'}), 404
 
-    # Отзываем сертификат
-    # Здесь можете добавить любую логику, связанную с отзывом (например, пометить как отозванный)
-    # Например, если есть поле revoked в таблице, то:
-    # certificate.revoked = True
-    # db.session.commit()
+    nft_token = NFTToken.query.filter_by(certificate_id=certificate.id).first()
+    if nft_token and nft_token.token_hash:
+        abi = nft_token.abi
+        token_address = Web3.to_checksum_address(nft_token.token_hash)
 
-    db.session.delete(certificate)  # Пример: удаление сертификата из базы данных
-    db.session.commit()
+        contract = w3.eth.contract(address=token_address, abi=abi)
 
-    return jsonify({'message': 'Сертификат отозван.'}), 200
+        user = User.query.get(certificate.owner_id)
+        if not user:
+            return jsonify({'error': 'Пользователь не найден'}), 404
+
+        try:
+            tx = contract.functions.revoke(user.nft_wallet_address).buildTransaction({
+                'chainId': 80001,
+                'gas': 70000,
+                'gasPrice': w3.to_wei('20', 'gwei'),
+                'nonce': w3.eth.get_transaction_count(user.nft_wallet_address),
+            })
+
+            signed_tx = w3.eth.account.signTransaction(tx, private_key='Как передавать ключ пока не придумал, '
+                                                                       'мб брать отюзеров, но тогда его нужно сейвить '
+                                                                       'по хитрому в БД.')
+            tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+
+            return jsonify({'message': 'Сертификат отозван. TX Hash: ' + tx_hash.hex()}), 200
+        except Exception as e:
+            return jsonify({'error': 'Ошибка отзыва NFT', 'details': str(e)}), 400
+    else:
+        return jsonify({'error': 'NFT не найден'}), 404
 
 
 def transfer_certificate(id):
@@ -227,7 +245,7 @@ def transfer_certificate(id):
               properties:
                 message:
                   type: string
-                  example: "Сертификат успешно передан."
+                  example: "Сертификат успешно передан. TX Hash: 0x123abc..."
       404:
         description: Certificate or user not found
         content:
@@ -239,7 +257,7 @@ def transfer_certificate(id):
                   type: string
                   example: "Пользователь не найден"
       400:
-        description: Error transferring certificate
+        description: Error transferring NFT
         content:
           application/json:
             schema:
@@ -247,26 +265,46 @@ def transfer_certificate(id):
               properties:
                 error:
                   type: string
-                  example: "Ошибка передачи сертификата"
+                  example: "Ошибка передачи NFT"
     """
-    # Получаем сертификат по ID
     certificate = Certificate.query.get(id)
     if not certificate:
         return jsonify({'error': 'Сертификат не найден'}), 404
 
-    # Получаем ID пользователя, которому передаём сертификат
     to_user_id = request.json.get('to_user_id')
     to_user = User.query.get(to_user_id)
 
     if not to_user:
         return jsonify({'error': 'Пользователь не найден'}), 404
 
-    # Меняем владельца сертификата
-    certificate.owner_id = to_user.id
-    db.session.commit()
+    nft_token = NFTToken.query.filter_by(certificate_id=certificate.id).first()
+    if nft_token and nft_token.token_hash:
+        abi = nft_token.abi
+        token_address = Web3.to_checksum_address(nft_token.token_hash)
 
-    return jsonify({'message': 'Сертификат успешно передан.'}), 200
+        contract = w3.eth.contract(address=token_address, abi=abi)
 
+        try:
+            tx = contract.functions.transfer(to_user.nft_wallet_address).buildTransaction({
+                'chainId': 80001,
+                'gas': 70000,
+                'gasPrice': w3.to_wei('20', 'gwei'),
+                'nonce': w3.eth.get_transaction_count(certificate.owner.nft_wallet_address),
+            })
+
+            signed_tx = w3.eth.account.signTransaction(tx, private_key='Как передавать ключ пока не придумал, '
+                                                                       'мб брать отюзеров, но тогда его нужно сейвить '
+                                                                       'по хитрому в БД.')
+            tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+
+            certificate.owner_id = to_user.id
+            db.session.commit()
+
+            return jsonify({'message': 'Сертификат успешно передан. TX Hash: ' + tx_hash.hex()}), 200
+        except Exception as e:
+            return jsonify({'error': 'Ошибка передачи NFT', 'details': str(e)}), 400
+    else:
+        return jsonify({'error': 'NFT не найден'}), 404
 
 
 def get_certificate_after_course():
