@@ -16,7 +16,7 @@ NFT VC Platform — это платформа для управления сер
 
 - **backend** — Бэкенд
 - **frontend** — Фронт
-- **docs** — Документация в виде веб-сайта. [Ссылка на документацию](https://nft-vc-platform.com/docs)
+- **docs** — Документация в виде веб-сайта. [Ссылка на документацию](https://saltyfrappuccino.github.io/nft_vc_platform/главная.html)
 
 ## Структура БД
 
