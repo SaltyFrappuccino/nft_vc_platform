@@ -13,15 +13,16 @@ USE `nft_vc_platform` ;
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `nft_vc_platform`.`users` ;
 
-CREATE TABLE IF NOT EXISTS `nft_vc_platform`.`users` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `first_name` VARCHAR(100) NULL DEFAULT NULL,
-  `last_name` VARCHAR(100) NULL DEFAULT NULL,
-  `email` VARCHAR(255) NOT NULL,
-  `password` VARCHAR(255) NOT NULL,
-  `bio` TEXT NULL DEFAULT NULL,
-  `skills` JSON NULL DEFAULT NULL,
-  PRIMARY KEY (`id`))
+CREATE TABLE `users` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `first_name` varchar(100) DEFAULT NULL,
+  `last_name` varchar(100) DEFAULT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `nft_wallet_address` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
